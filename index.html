@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Orçamento - Fulfillment</title>
+    <meta name="description" content="Simulador de orçamento para serviços de fulfillment - armazenagem e processamento de pedidos">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 30px 20px;
+        }
+
+        /* SECTIONS */
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            font-size: 1.3em;
+        }
+
+        /* FORM GROUPS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 3px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* INFO BOX */
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .suggestion {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* RESULTS */
+        .results {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .results-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .results-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .results-row:last-child {
+            border-bottom: none;
+        }
+
+        .results-row.header {
+            background: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+
+        .results-row.total {
+            background: #27ae60;
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .result-label {
+            flex: 1;
+        }
+
+        .result-qty {
+            width: 100px;
+            text-align: center;
+        }
+
+        .result-unit {
+            width: 120px;
+            text-align: center;
+        }
+
+        .result-value {
+            width: 150px;
+            text-align: right;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .result-value.total {
+            color: white;
+        }
+
+        /* BUTTONS */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.6);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            font-size: 2em;
+            color: #95a5a6;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+
+        .proposta-text {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .header p {
+                font-size: 0.95em;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 20px 15px;
+            }
+
+            .results-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .result-qty, .result-unit, .result-value {
+                width: 100%;
+                text-align: left;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .proposta-text {
+                font-size: 0.75em;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* LOADING */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📦 Simulador de Orçamento</h1>
+            <p>Armazenagem e Fulfillment - Cotação Instantânea</p>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- DADOS DO LEAD -->
+            <div class="section">
+                <div class="section-title">
+                    <span>👤</span>
+                    <span>Dados do Lead</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Lead <span class="required">*</span></label>
+                        <input type="text" id="nomeLead" placeholder="João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label>Email <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="joao@empresa.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome da Empresa <span class="required">*</span></label>
+                        <input type="text" id="empresa" placeholder="Empresa LTDA">
+                    </div>
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Telefone/WhatsApp <span class="required">*</span></label>
+                    <input type="tel" id="contato" placeholder="(11) 99999-9999">
+                </div>
+            </div>
+
+            <!-- INFORMAÇÕES DO NEGÓCIO -->
+            <div class="section">
+                <div class="section-title">
+                    <span>🏪</span>
+                    <span>Informações do Negócio</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Segmento <span class="required">*</span></label>
+                        <select id="segmento">
+                            <option value="">Selecione...</option>
+                            <option value="Cosméticos">Cosméticos</option>
+                            <option value="Suplementos">Suplementos</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Moda/Vestuário">Moda/Vestuário</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Livros/Papelaria">Livros/Papelaria</option>
+                            <option value="Casa e Decoração">Casa e Decoração</option>
+                            <option value="Pet Shop">Pet Shop</option>
+                            <option value="Farmácia/Saúde">Farmácia/Saúde</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Envio <span class="required">*</span></label>
+                        <select id="tipoEnvio">
+                            <option value="">Selecione...</option>
+                            <option value="B2C (Consumidor Final)">B2C (Consumidor Final)</option>
+                            <option value="B2B (Empresas)">B2B (Empresas)</option>
+                            <option value="B2C e B2B (Misto)">B2C e B2B (Misto)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DADOS OPERACIONAIS -->
+            <div class="section">
+                <div class="section-title">
+                    <span>📊</span>
+                    <span>Dados Operacionais</span>
+                </div>
+
+                <div class="info-box">
+                    ℹ️ <strong>Referência:</strong> 1 posição palete (1m x 1,2m x 1,5m) armazena de 3 a 4 SKUs
+                </div>
+
+                <div class="form-group">
+                    <label>Quantidade de SKUs <span class="required">*</span></label>
+                    <input type="number" id="qtdSku" placeholder="Ex: 50" min="1">
+                    <div class="help-text">Quantidade de produtos diferentes no catálogo</div>
+                    <div class="suggestion" id="suggestionPosicoes"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Posições de Palete Necessárias <span class="required">*</span></label>
+                    <input type="number" id="posicoes" placeholder="Ex: 15" min="1">
+                    <div class="help-text">Quantidade de posições que serão ocupadas no armazém</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Pedidos por Mês <span class="required">*</span></label>
+                    <input type="number" id="pedidosMes" placeholder="Ex: 500" min="1">
+                    <div class="help-text">Volume mensal estimado de pedidos a processar</div>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="results" id="resultsSection" style="display: none;">
+                <div class="results-title">💰 Simulação de Valores</div>
+
+                <div class="results-table">
+                    <div class="results-row header">
+                        <div class="result-label">Serviço</div>
+                        <div class="result-qty">Qtd</div>
+                        <div class="result-unit">Valor Unit.</div>
+                        <div class="result-value">Subtotal/Mês</div>
+                    </div>
+
+                    <div class="results-row">
+                        <div class="result-label">📦 Armazenagem (Posições Palete)</div>
+                        <div class="result-qty" id="displayPosicoes">0</div>
+                        <div class="result-unit">R$ 130,00</div>
+                        <div class="result-value" id="displayArmazenagem">R$ 0,00</div>
+                    </div>
+
+                    <div class="results-row">
+                        <div class="result-label">📋 Processamento de Pedidos</div>
+                        <div class="result-qty" id="displayPedidos">0</div>
+                        <div class="result-unit">R$ 5,80</div>
+                        <div class="result-value" id="displayProcessamento">R$ 0,00</div>
+                    </div>
+
+                    <div class="results-row total">
+                        <div class="result-label">TOTAL MENSAL</div>
+                        <div class="result-qty"></div>
+                        <div class="result-unit"></div>
+                        <div class="result-value total" id="displayTotal">R$ 0,00</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    💡 <strong>Projeção Anual:</strong> <span id="displayAnual">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="gerarProposta()">
+                    📄 Gerar Proposta Comercial
+                </button>
+                <button class="btn btn-secondary" onclick="limparTudo()">
+                    🔄 Limpar Tudo
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px;">Gerando proposta...</p>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>* Campos obrigatórios | Valores sujeitos a ajustes conforme análise detalhada</p>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📄 Proposta Comercial</div>
+                <button class="close-btn" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="proposta-text" id="propostaTexto"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="copiarProposta()">📋 Copiar Texto</button>
+                <button class="btn btn-secondary" onclick="baixarProposta()">💾 Baixar TXT</button>
+                <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PREÇOS
+        const PRECO_POSICAO = 130.00;
+        const PRECO_PEDIDO = 5.80;
+        const SKU_MIN = 3;
+        const SKU_MAX = 4;
+
+        // ELEMENTOS
+        const inputs = {
+            qtdSku: document.getElementById('qtdSku'),
+            posicoes: document.getElementById('posicoes'),
+            pedidosMes: document.getElementById('pedidosMes')
+        };
+
+        // CALCULAR EM TEMPO REAL
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calcularAutomatico);
+        });
+
+        function calcularAutomatico() {
+            const qtdSku = parseInt(inputs.qtdSku.value) || 0;
+            const posicoes = parseInt(inputs.posicoes.value) || 0;
+            const pedidosMes = parseInt(inputs.pedidosMes.value) || 0;
+
+            // Sugestão de posições
+            if (qtdSku > 0) {
+                const minPosicoes = Math.ceil(qtdSku / SKU_MAX);
+                const maxPosicoes = Math.ceil(qtdSku / SKU_MIN);
+                const suggestion = document.getElementById('suggestionPosicoes');
+                
+                if (minPosicoes === maxPosicoes) {
+                    suggestion.textContent = `💡 Sugestão: aproximadamente ${minPosicoes} posições`;
+                } else {
+                    suggestion.textContent = `💡 Sugestão: entre ${minPosicoes} e ${maxPosicoes} posições`;
+                }
+                suggestion.style.display = 'block';
+            } else {
+                document.getElementById('suggestionPosicoes').style.display = 'none';
+            }
+
+            // Calcular valores
+            const totalArmazenagem = posicoes * PRECO_POSICAO;
+            const totalPedidos = pedidosMes * PRECO_PEDIDO;
+            const totalMensal = totalArmazenagem + totalPedidos;
+            const totalAnual = totalMensal * 12;
+
+            // Mostrar resultados
+            if (posicoes > 0 || pedidosMes > 0) {
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('displayPosicoes').textContent = posicoes;
+                document.getElementById('displayPedidos').textContent = pedidosMes;
+                document.getElementById('displayArmazenagem').textContent = formatarMoeda(totalArmazenagem);
+                document.getElementById('displayProcessamento').textContent = formatarMoeda(totalPedidos);
+                document.getElementById('displayTotal').textContent = formatarMoeda(totalMensal);
+                document.getElementById('displayAnual').textContent = formatarMoeda(totalAnual);
+            }
+        }
+
+        function formatarMoeda(valor) {
+            return 'R$ ' + valor.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function validarCampos() {
+            const campos = [
+                { id: 'nomeLead', nome: 'Nome do Lead' },
+                { id: 'email', nome: 'Email' },
+                { id: 'empresa', nome: 'Nome da Empresa' },
+                { id: 'contato', nome: 'Telefone/WhatsApp' },
+                { id: 'segmento', nome: 'Segmento' },
+                { id: 'tipoEnvio', nome: 'Tipo de Envio' },
+                { id: 'qtdSku', nome: 'Quantidade de SKUs' },
+                { id: 'posicoes', nome: 'Posições de Palete' },
+                { id: 'pedidosMes', nome: 'Pedidos por Mês' }
+            ];
+
+            for (let campo of campos) {
+                const valor = document.getElementById(campo.id).value;
+                if (!valor || valor.trim() === '') {
+                    alert(`⚠️ Por favor, preencha: ${campo.nome}`);
+                    document.getElementById(campo.id).focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function gerarProposta() {
+            if (!validarCampos()) return;
+
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(() => {
+                // Coletar dados
+                const dados = {
+                    nomeLead: document.getElementById('nomeLead').value,
+                    empresa: document.getElementById('empresa').value,
+                    cnpj: document.getElementById('cnpj').value,
+                    email: document.getElementById('email').value,
+                    contato: document.getElementById('contato').value,
+                    segmento: document.getElementById('segmento').value,
+                    tipoEnvio: document.getElementById('tipoEnvio').value,
+                    qtdSku: parseInt(inputs.qtdSku.value),
+                    posicoes: parseInt(inputs.posicoes.value),
+                    pedidosMes: parseInt(inputs.pedidosMes.value)
+                };
+
+                // Calcular
+                const totalArmazenagem = dados.posicoes * PRECO_POSICAO;
+                const totalPedidos = dados.pedidosMes * PRECO_PEDIDO;
+                const totalMensal = totalArmazenagem + totalPedidos;
+                const totalAnual = totalMensal * 12;
+
+                // Gerar texto
+                const agora = new Date();
+                const dataFormatada = agora.toLocaleDateString('pt-BR');
+                const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+                const proposta = `
+${'='.repeat(80)}
+                    PROPOSTA COMERCIAL - SERVIÇOS DE FULFILLMENT
+${'='.repeat(80)}
+
+Data da Proposta: ${dataFormatada} às ${horaFormatada}
+Validade: 15 dias
+
+${'='.repeat(80)}
+DADOS DO CLIENTE
+${'='.repeat(80)}
+
+Lead: ${dados.nomeLead}
+Empresa: ${dados.empresa}
+${dados.cnpj ? 'CNPJ: ' + dados.cnpj : ''}
+Email: ${dados.email}
+Contato: ${dados.contato}
+
+${'='.repeat(80)}
+INFORMAÇÕES DO NEGÓCIO
+${'='.repeat(80)}
+
+Segmento de Atuação: ${dados.segmento}
+Tipo de Operação: ${dados.tipoEnvio}
+Quantidade de SKUs: ${dados.qtdSku} produtos diferentes
+Volume de Pedidos: ${dados.pedidosMes} pedidos/mês
+
+${'='.repeat(80)}
+SERVIÇOS COTADOS
+${'='.repeat(80)}
+
+1. ARMAZENAGEM
+   ├─ Posições de Palete Necessárias: ${dados.posicoes} posições
+   ├─ Dimensão da Posição: 1,0m x 1,2m x 1,5m
+   ├─ Capacidade: 3 a 4 SKUs por posição
+   ├─ Valor Unitário: ${formatarMoeda(PRECO_POSICAO)}/posição/mês
+   └─ SUBTOTAL ARMAZENAGEM: ${formatarMoeda(totalArmazenagem)}/mês
+
+2. PROCESSAMENTO DE PEDIDOS
+   ├─ Volume Estimado: ${dados.pedidosMes} pedidos/mês
+   ├─ Valor Unitário: ${formatarMoeda(PRECO_PEDIDO)}/pedido
+   └─ SUBTOTAL PROCESSAMENTO: ${formatarMoeda(totalPedidos)}/mês
+
+${'='.repeat(80)}
+RESUMO FINANCEIRO
+${'='.repeat(80)}
+
+Armazenagem (Mensal):                    ${formatarMoeda(totalArmazenagem)}
+Processamento de Pedidos (Mensal):       ${formatarMoeda(totalPedidos)}
+${'-'.repeat(80)}
+VALOR TOTAL MENSAL:                      ${formatarMoeda(totalMensal)}
+${'='.repeat(80)}
+
+PROJEÇÃO ANUAL (12 meses):               ${formatarMoeda(totalAnual)}
+
+${'='.repeat(80)}
+SERVIÇOS INCLUSOS
+${'='.repeat(80)}
+
+✓ Recebimento de mercadorias
+✓ Conferência e inspeção de qualidade
+✓ Armazenagem em área climatizada e segura
+✓ Gestão de estoque via sistema WMS
+✓ Picking e separação de pedidos
+✓ Embalagem personalizada (quando aplicável)
+✓ Etiquetagem e preparação para expedição
+✓ Interface com transportadoras
+✓ Suporte operacional
+
+${'='.repeat(80)}
+CONDIÇÕES COMERCIAIS
+${'='.repeat(80)}
+
+• Forma de Pagamento: Mensal, vencimento até o dia 10
+• Reajuste: Anual, conforme IGP-M ou IPCA
+• Período Mínimo de Contrato: 12 meses
+• Faturamento: Mensal, baseado no uso real
+
+${'='.repeat(80)}
+OBSERVAÇÕES IMPORTANTES
+${'='.repeat(80)}
+
+1. Os valores apresentados são estimativas baseadas nas informações fornecidas
+2. Variações no volume de pedidos serão cobradas conforme uso efetivo
+3. Serviços adicionais (embalagem especial, kitting, etc.) sob consulta
+4. Sistema de gestão com acesso em tempo real ao estoque e pedidos
+5. Equipe dedicada e treinada para seu segmento
+
+${'='.repeat(80)}
+PRÓXIMOS PASSOS
+${'='.repeat(80)}
+
+1. Análise e aprovação da proposta
+2. Visita técnica às instalações (se necessário)
+3. Assinatura do contrato
+4. Onboarding e integração de sistemas
+5. Início da operação
+
+${'='.repeat(80)}
+
+Estamos à disposição para esclarecer quaisquer dúvidas e ajustar a proposta
+conforme necessário.
+
+Atenciosamente,
+
+Equipe Comercial
+[SUA EMPRESA - FULFILLMENT & LOGÍSTICA]
+
+${'='.repeat(80)}
+                `;
+
+                // Esconder loading
+                document.getElementById('loading').style.display = 'none';
+
+                // Mostrar modal
+                document.getElementById('propostaTexto').textContent = proposta;
+                document.getElementById('modal').style.display = 'block';
+
+                // Salvar proposta global para download
+                window.propostaAtual = proposta;
+                window.nomeArquivo = `proposta_${dados.empresa.replace(/\s+/g, '_')}_${agora.getTime()}.txt`;
+            }, 800);
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function copiarProposta() {
+            const texto = document.getElementById('propostaTexto').textContent;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert('✅ Proposta copiada para a área de transferência!');
+            }).catch(() => {
+                alert('❌ Erro ao copiar. Tente selecionar e copiar manualmente.');
+            });
+        }
+
+        function baixarProposta() {
+            const blob = new Blob([window.propostaAtual], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = window.nomeArquivo;
+            link.click();
+            alert('✅ Download iniciado!');
+        }
+
+        function limparTudo() {
+            if (confirm('🔄 Deseja realmente limpar todos os campos?')) {
+                document.querySelectorAll('input, select').forEach(el => {
+                    el.value = '';
+                });
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('suggestionPosicoes').style.display = 'none';
+                alert('✅ Todos os campos foram limpos!');
+            }
+        }
+
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                fecharModal();
+            }
+        }
+    </script>
+</body>
+</html>
