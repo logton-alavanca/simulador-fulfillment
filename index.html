@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logton - Simulador de Orçamento Fulfillment</title>
+    <title>Logton - Simulador v1770727739</title>
     <meta name="description" content="Simule o orçamento para armazenagem e fulfillment da Logton. Serviços personalizados para seu e-commerce.">
     
     <style>
@@ -1006,6 +1005,9 @@
     </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        console.log("🚀 VERSÃO 1770727739 CARREGADA!");
+        alert("Versão atualizada carregada! Timestamp: 1770727739");
+
         // CONSTANTES
         const PRECO_POSICAO = 130.00;
         const PRECO_PEDIDO = 5.80;
@@ -1115,90 +1117,124 @@
         }
 
         function simularOrcamento() {
-            if (!validarCampos()) return;
+            try {
+                console.log('🔍 Função simularOrcamento chamada!');
+                
+                if (!validarCampos()) {
+                    console.log('❌ Validação falhou');
+                    return;
+                }
+                
+                console.log('✅ Validação passou');
 
-            // Calcular posições (estimado ou informado)
-            const resultPosicoes = calcularPosicoes();
-            const posicoes = resultPosicoes.posicoes;
-            const pedidosMes = parseInt(inputs.pedidosMes.value) || 0;
-            const valorMercadoria = parseFloat(inputs.valorMercadoria.value) || 0;
-            const temGestaoErp = inputs.gestaoErp.checked;
+                // Calcular posições (estimado ou informado)
+                const resultPosicoes = calcularPosicoes();
+                const posicoes = resultPosicoes.posicoes;
+                const pedidosMes = parseInt(inputs.pedidosMes.value) || 0;
+                const valorMercadoria = parseFloat(inputs.valorMercadoria.value) || 0;
+                const temGestaoErp = inputs.gestaoErp.checked;
 
-            // Calcular valores base
-            const totalArmazenagem = posicoes * PRECO_POSICAO;
-            const totalPedidos = pedidosMes * PRECO_PEDIDO;
-            
-            // Calcular serviços adicionais
-            const totalSeguro = valorMercadoria * PERCENTUAL_SEGURO;
-            const totalEnderecoFiscal = PRECO_ENDERECO_FISCAL; // SEMPRE INCLUSO
-            const totalGestaoErp = temGestaoErp ? PRECO_GESTAO_ERP : 0;
+                console.log('📊 Dados coletados:', { posicoes, pedidosMes, valorMercadoria, temGestaoErp });
 
-            // Total geral (SEMPRE inclui endereço fiscal e seguro)
-            let totalMensal = totalArmazenagem + totalPedidos + totalSeguro + totalEnderecoFiscal + totalGestaoErp;
-            let isPlanSeeds = false;
+                // Calcular valores base
+                const totalArmazenagem = posicoes * PRECO_POSICAO;
+                const totalPedidos = pedidosMes * PRECO_PEDIDO;
+                
+                // Calcular serviços adicionais
+                const totalSeguro = valorMercadoria * PERCENTUAL_SEGURO;
+                const totalEnderecoFiscal = PRECO_ENDERECO_FISCAL; // SEMPRE INCLUSO
+                const totalGestaoErp = temGestaoErp ? PRECO_GESTAO_ERP : 0;
 
-            // Verificar Plano Seeds
-            if (totalMensal > 0 && totalMensal < VALOR_MINIMO_SEEDS) {
-                totalMensal = VALOR_MINIMO_SEEDS;
-                isPlanSeeds = true;
+                // Total geral (SEMPRE inclui endereço fiscal e seguro)
+                let totalMensal = totalArmazenagem + totalPedidos + totalSeguro + totalEnderecoFiscal + totalGestaoErp;
+                let isPlanSeeds = false;
+
+                // Verificar Plano Seeds
+                if (totalMensal > 0 && totalMensal < VALOR_MINIMO_SEEDS) {
+                    totalMensal = VALOR_MINIMO_SEEDS;
+                    isPlanSeeds = true;
+                }
+
+                console.log('💰 Total calculado:', totalMensal);
+
+                // Atualizar apenas o display do total
+                const displayTotal = document.getElementById('displayTotal');
+                if (!displayTotal) {
+                    console.error('❌ Elemento displayTotal não encontrado!');
+                    alert('Erro: Elemento displayTotal não encontrado. Por favor, recarregue a página.');
+                    return;
+                }
+                displayTotal.textContent = formatarMoeda(totalMensal);
+
+                // Mostrar/esconder info Plano Seeds
+                const seedsInfo = document.getElementById('seedsInfo');
+                
+                if (isPlanSeeds) {
+                    seedsInfo.style.display = 'block';
+                } else {
+                    seedsInfo.style.display = 'none';
+                }
+
+                // Mostrar info de estimativa se aplicável
+                const posicoesInfo = document.getElementById('posicoesInfo');
+                if (resultPosicoes.isEstimado) {
+                    document.getElementById('estimativaTexto').textContent = resultPosicoes.textoEstimativa;
+                    posicoesInfo.style.display = 'block';
+                } else {
+                    posicoesInfo.style.display = 'none';
+                }
+
+                // Salvar dados para envio posterior
+                window.dadosOrcamento = {
+                    dataHora: new Date().toLocaleString('pt-BR'),
+                    nomeLead: document.getElementById('nomeLead').value,
+                    email: document.getElementById('email').value,
+                    whatsapp: document.getElementById('whatsapp').value,
+                    empresa: document.getElementById('empresa').value,
+                    cnpj: document.getElementById('cnpj').value || 'Não informado',
+                    segmento: document.getElementById('segmento').value,
+                    tipoEnvio: document.getElementById('tipoEnvio').value,
+                    qtdSku: parseInt(inputs.qtdSku.value),
+                    posicoes: posicoes,
+                    posicoesEstimadas: resultPosicoes.isEstimado ? 'Sim' : 'Não',
+                    pedidosMes: pedidosMes,
+                    valorMercadoria: valorMercadoria,
+                    packingPersonalizado: inputs.packingPersonalizado.checked ? 'Sim' : 'Não',
+                    gestaoErp: temGestaoErp ? 'Sim' : 'Não',
+                    valorArmazenagem: formatarMoeda(totalArmazenagem),
+                    valorProcessamento: formatarMoeda(totalPedidos),
+                    valorSeguro: formatarMoeda(totalSeguro),
+                    valorEnderecoFiscal: formatarMoeda(totalEnderecoFiscal),
+                    valorGestaoErp: formatarMoeda(totalGestaoErp),
+                    valorTotalMensal: formatarMoeda(totalMensal),
+                    plano: isPlanSeeds ? 'Seeds' : 'Variável',
+                    status: 'Novo Lead'
+                };
+
+                console.log('✅ Abrindo modal...');
+                
+                // Mostrar modal
+                const modal = document.getElementById('resultsModal');
+                if (!modal) {
+                    console.error('❌ Modal não encontrado!');
+                    alert('Erro: Modal não encontrado. Por favor, recarregue a página.');
+                    return;
+                }
+                modal.style.display = 'block';
+
+                console.log('✅ Modal aberto!');
+
+                // Enviar dados para Google Sheets
+                enviarParaGoogleSheets(window.dadosOrcamento);
+
+                // Log dos dados
+                console.log('📤 Dados da simulação:', window.dadosOrcamento);
+                
+            } catch (error) {
+                console.error('❌ ERRO NA FUNÇÃO:', error);
+                alert('Erro ao processar simulação: ' + error.message + '\n\nPor favor, recarregue a página e tente novamente.');
             }
-
-            // Atualizar apenas o display do total
-            document.getElementById('displayTotal').textContent = formatarMoeda(totalMensal);
-
-            // Mostrar/esconder info Plano Seeds
-            const seedsInfo = document.getElementById('seedsInfo');
-            
-            if (isPlanSeeds) {
-                seedsInfo.style.display = 'block';
-            } else {
-                seedsInfo.style.display = 'none';
-            }
-
-            // Mostrar info de estimativa se aplicável
-            const posicoesInfo = document.getElementById('posicoesInfo');
-            if (resultPosicoes.isEstimado) {
-                document.getElementById('estimativaTexto').textContent = resultPosicoes.textoEstimativa;
-                posicoesInfo.style.display = 'block';
-            } else {
-                posicoesInfo.style.display = 'none';
-            }
-
-            // Salvar dados para envio posterior
-            window.dadosOrcamento = {
-                dataHora: new Date().toLocaleString('pt-BR'),
-                nomeLead: document.getElementById('nomeLead').value,
-                email: document.getElementById('email').value,
-                whatsapp: document.getElementById('whatsapp').value,
-                empresa: document.getElementById('empresa').value,
-                cnpj: document.getElementById('cnpj').value || 'Não informado',
-                segmento: document.getElementById('segmento').value,
-                tipoEnvio: document.getElementById('tipoEnvio').value,
-                qtdSku: parseInt(inputs.qtdSku.value),
-                posicoes: posicoes,
-                posicoesEstimadas: resultPosicoes.isEstimado ? 'Sim' : 'Não',
-                pedidosMes: pedidosMes,
-                valorMercadoria: valorMercadoria,
-                packingPersonalizado: inputs.packingPersonalizado.checked ? 'Sim' : 'Não',
-                gestaoErp: temGestaoErp ? 'Sim' : 'Não',
-                valorArmazenagem: formatarMoeda(totalArmazenagem),
-                valorProcessamento: formatarMoeda(totalPedidos),
-                valorSeguro: formatarMoeda(totalSeguro),
-                valorEnderecoFiscal: formatarMoeda(totalEnderecoFiscal),
-                valorGestaoErp: formatarMoeda(totalGestaoErp),
-                valorTotalMensal: formatarMoeda(totalMensal),
-                plano: isPlanSeeds ? 'Seeds' : 'Variável',
-                status: 'Novo Lead'
-            };
-
-            // Mostrar modal
-            document.getElementById('resultsModal').style.display = 'block';
-
-            // Enviar dados para Google Sheets
-            enviarParaGoogleSheets(window.dadosOrcamento);
-
-            // Log dos dados (remover em produção)
-            console.log('Dados da simulação:', window.dadosOrcamento);
+        }
         }
 
         function enviarParaGoogleSheets(dados) {
