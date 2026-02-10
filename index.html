@@ -865,19 +865,12 @@
                     </p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                <div style="text-align: center; margin-top: 30px;">
                     <a href="https://wa.me/5516999615069?text=Olá!%20Acabei%20de%20fazer%20uma%20simulação%20no%20site%20e%20gostaria%20de%20falar%20com%20um%20consultor" 
                        target="_blank" 
                        class="btn btn-secondary" 
-                       style="font-size: 1.1em; display: inline-flex; align-items: center; gap: 10px; justify-content: center; text-decoration: none;">
+                       style="font-size: 1.2em; display: inline-flex; align-items: center; gap: 10px;">
                         💬 Falar com Consultor
-                    </a>
-                    
-                    <a href="https://calendly.com/agenda-logton/30min" 
-                       target="_blank" 
-                       class="btn btn-primary" 
-                       style="font-size: 1.1em; display: inline-flex; align-items: center; gap: 10px; justify-content: center; text-decoration: none;">
-                        📅 Agendar Reunião
                     </a>
                 </div>
             </div>
@@ -991,7 +984,7 @@
                 <h3>Contato</h3>
                 <p>📞 (16) 3939-5008</p>
                 <p>📱 (16) 99961-5069</p>
-                <p>✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ea8985849e8b9e85aa86858d9e8584c4898587c48898">[email&#160;protected]</a></p>
+                <p>✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fd9e9293899c8992bd91929a899293d39e9290d39f8f">[email&#160;protected]</a></p>
             </div>
 
             <div>
@@ -1246,30 +1239,11 @@
             // Mostrar modal
             document.getElementById('resultsModal').style.display = 'block';
 
-            // Enviar dados para Google Sheets
-            enviarParaGoogleSheets(window.dadosOrcamento);
-
             // Log dos dados (remover em produção)
             console.log('Dados da simulação:', window.dadosOrcamento);
-        }
 
-        function enviarParaGoogleSheets(dados) {
-            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzHWbB0Of48HolY-1nfwKvgtpj5bgdNBWuscTMBNvQeCutcJfReMJ1lMaQ5a_6_vbE1/exec';
-            
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dados)
-            })
-            .then(() => {
-                console.log('✅ Dados enviados para Google Sheets com sucesso!');
-            })
-            .catch(error => {
-                console.error('❌ Erro ao enviar para Google Sheets:', error);
-            });
+            // Aqui você adicionará o envio para Google Sheets via Zapier/Make
+            // fetch('URL_DO_WEBHOOK', { method: 'POST', body: JSON.stringify(window.dadosOrcamento) })
         }
 
         function fecharSimulacao() {
@@ -1304,10 +1278,7 @@
 
         // Log inicial
         console.log('🚀 Simulador Logton V3 carregado!');
-        coizado: +2.5 posições');
-        console.log('🎨 Cores: Azul #0d3b52 (logo oficial)');
-        console.log('📧 Email:', 'contato@logton.com.br');
-        console.log('📱 WhatsApp:', '+55 16 99961-5069');
-    </script>
-</body>
-</html>
+        console.log('✅ Posições: opcional (estimativa automática)');
+        console.log('✅ Cálculo: 2 SKUs por posição');
+        console.log('✅ Endereço Fiscal: obrigatório (R$ 230)');
+        console.log('✅ Packing Personalizado: +2
