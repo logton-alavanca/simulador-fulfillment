@@ -1133,7 +1133,7 @@
             const totalEnderecoFiscal = PRECO_ENDERECO_FISCAL; // SEMPRE INCLUSO
             const totalGestaoErp = temGestaoErp ? PRECO_GESTAO_ERP : 0;
 
-            // Total geral (SEMPRE inclui endereço fiscal)
+            // Total geral (SEMPRE inclui endereço fiscal e seguro)
             let totalMensal = totalArmazenagem + totalPedidos + totalSeguro + totalEnderecoFiscal + totalGestaoErp;
             let isPlanSeeds = false;
 
@@ -1143,38 +1143,16 @@
                 isPlanSeeds = true;
             }
 
-            // Atualizar display
-            document.getElementById('displayPosicoes').textContent = posicoes;
-            document.getElementById('displayPedidos').textContent = pedidosMes;
-            document.getElementById('displayArmazenagem').textContent = formatarMoeda(totalArmazenagem);
-            document.getElementById('displayProcessamento').textContent = formatarMoeda(totalPedidos);
+            // Atualizar apenas o display do total
             document.getElementById('displayTotal').textContent = formatarMoeda(totalMensal);
-
-            // Mostrar/esconder serviços adicionais
-            if (valorMercadoria > 0) {
-                document.getElementById('rowSeguro').style.display = 'grid';
-                document.getElementById('displayValorMercadoria').textContent = formatarMoeda(valorMercadoria);
-                document.getElementById('displaySeguro').textContent = formatarMoeda(totalSeguro);
-            } else {
-                document.getElementById('rowSeguro').style.display = 'none';
-            }
-
-            if (temGestaoErp) {
-                document.getElementById('rowGestaoErp').style.display = 'grid';
-            } else {
-                document.getElementById('rowGestaoErp').style.display = 'none';
-            }
 
             // Mostrar/esconder info Plano Seeds
             const seedsInfo = document.getElementById('seedsInfo');
-            const totalRow = document.getElementById('totalRow');
             
             if (isPlanSeeds) {
                 seedsInfo.style.display = 'block';
-                totalRow.className = 'results-row seeds-plan';
             } else {
                 seedsInfo.style.display = 'none';
-                totalRow.className = 'results-row total';
             }
 
             // Mostrar info de estimativa se aplicável
