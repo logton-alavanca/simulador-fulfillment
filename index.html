@@ -878,10 +878,10 @@
 
         <!-- BUTTONS -->
         <div class="button-group" id="formButtons">
-            <button type="button" class="btn btn-primary" onclick="simularOrcamento(event)">
+            <button class="btn btn-primary" onclick="simularOrcamento()">
                 📊 SIMULAR
             </button>
-            <button type="button" class="btn btn-outline" onclick="limparTudo(event)">
+            <button class="btn btn-outline" onclick="limparTudo()">
                 🔄 Limpar
             </button>
         </div>
@@ -984,7 +984,7 @@
                 <h3>Contato</h3>
                 <p>📞 (16) 3939-5008</p>
                 <p>📱 (16) 99961-5069</p>
-                <p>✉️ contato@logton.com.br</p>
+                <p>✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="197a76776d786d765975767e6d7677377a7674377b6b">[email&#160;protected]</a></p>
             </div>
 
             <div>
@@ -1029,7 +1029,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // CONSTANTES
         const PRECO_POSICAO = 130.00;
         const PRECO_PEDIDO = 5.80;
@@ -1115,11 +1115,7 @@
             if (posicoesInformadas === 0 && qtdSku > 0) {
                 // Estimativa: 2 SKUs por posição
                 posicoesFinal = Math.ceil(qtdSku / SKU_POR_POSICAO);
-                isEstimado = true;
-                textoEstimativa = `Baseado em ${qtdSku} SKUs, estimamos ${posicoesFinal} posições palete (considerando 2 SKUs por posição).`;
-            }
-
-            // Adiciona posições extras se tiver packing personalizado
+                isEstimado = trizado
             if (temPacking) {
                 posicoesFinal += POSICOES_PACKING;
                 if (isEstimado) {
@@ -1137,8 +1133,7 @@
             };
         }
 
-        function simularOrcamento(event) {
-            if (event) event.preventDefault();
+        function simularOrcamento() {
             if (!validarCampos()) return;
 
             // Calcular posições (estimado ou informado)
@@ -1240,38 +1235,18 @@
             // Mostrar modal
             document.getElementById('resultsModal').style.display = 'block';
 
-            // Enviar dados para Google Sheets
-            enviarParaGoogleSheets(window.dadosOrcamento);
-
             // Log dos dados (remover em produção)
             console.log('Dados da simulação:', window.dadosOrcamento);
-        }
 
-        function enviarParaGoogleSheets(dados) {
-            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzHWbB0Of48HolY-1nfwKvgtpj5bgdNBWuscTMBNvQeCutcJfReMJ1lMaQ5a_6_vbE1/exec';
-            
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dados)
-            })
-            .then(() => {
-                console.log('✅ Dados enviados para Google Sheets com sucesso!');
-            })
-            .catch(error => {
-                console.error('❌ Erro ao enviar para Google Sheets:', error);
-            });
+            // Aqui você adicionará o envio para Google Sheets via Zapier/Make
+            // fetch('URL_DO_WEBHOOK', { method: 'POST', body: JSON.stringify(window.dadosOrcamento) })
         }
 
         function fecharSimulacao() {
             document.getElementById('resultsModal').style.display = 'none';
         }
 
-        function limparTudo(event) {
-            if (event) event.preventDefault();
+        function limparTudo() {
             if (confirm('🔄 Deseja realmente limpar todos os campos?')) {
                 document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select').forEach(el => {
                     el.value = '';
