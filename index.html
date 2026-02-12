@@ -865,12 +865,20 @@
                     </p>
                 </div>
 
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://wa.me/5516999615069?text=Olá!%20Acabei%20de%20fazer%20uma%20simulação%20no%20site%20e%20gostaria%20de%20falar%20com%20um%20consultor" 
+                <!-- Botões de Ação -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                    <a href="https://wa.me/5516991693980?text=Olá!%20Acabei%20de%20fazer%20uma%20simulação%20no%20site%20e%20gostaria%20de%20falar%20com%20um%20consultor" 
                        target="_blank" 
                        class="btn btn-secondary" 
-                       style="font-size: 1.2em; display: inline-flex; align-items: center; gap: 10px;">
+                       style="font-size: 1.1em; display: inline-flex; align-items: center; gap: 10px; justify-content: center; text-decoration: none;">
                         💬 Falar com Consultor
+                    </a>
+                    
+                    <a href="https://calendly.com/agenda-logton/30min" 
+                       target="_blank" 
+                       class="btn btn-primary" 
+                       style="font-size: 1.1em; display: inline-flex; align-items: center; gap: 10px; justify-content: center; text-decoration: none;">
+                        📅 Agendar Reunião
                     </a>
                 </div>
             </div>
@@ -1232,14 +1240,42 @@
                 status: 'Novo Lead'
             };
 
+
             // Mostrar modal
             document.getElementById('resultsModal').style.display = 'block';
 
-            // Log dos dados (remover em produção)
-            console.log('Dados da simulação:', window.dadosOrcamento);
+            // Enviar notificação
+            enviarNotificacao(window.dadosOrcamento);
 
-            // Aqui você adicionará o envio para Google Sheets via Zapier/Make
-            // fetch('URL_DO_WEBHOOK', { method: 'POST', body: JSON.stringify(window.dadosOrcamento) })
+            // Log dos dados
+            console.log('Dados da simulação:', window.dadosOrcamento);
+        }
+
+        function enviarNotificacao(dados) {
+            // URL do Google Apps Script (VOCÊ VAI SUBSTITUIR)
+            const WEBHOOK_URL = https://script.google.com/macros/s/AKfycbzpx0BO1joiemxvMQYuqnquu6czuXKwP0ph_bm6jbfNQ5r59nFao0ZBprUFb5eD2bdKjg/exec;
+            
+            // Preparar dados para envio
+            const payload = {
+                tipo: 'simulacao',
+                ...dados
+            };
+            
+            // Enviar (comentado até você colar a URL)
+            
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => console.log('✅ Notificação enviada!'))
+            .catch(error => console.error('❌ Erro ao enviar:', error));
+            
+            
+            console.log('📧 Notificação preparada (ative removendo os /* */):', payload);
         }
 
         function fecharSimulacao() {
